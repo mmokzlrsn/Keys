@@ -29,6 +29,8 @@ public class Hex : MonoBehaviour
 
     public int Index = -1;
 
+    public static Queue<Hex> Unused = new Queue<Hex>();
+
     [SerializeField]
     private HexGridPoint hexGridPoint;
     public HexGridPoint HexGridPoint
@@ -41,28 +43,56 @@ public class Hex : MonoBehaviour
             hexGridPoint = value;
         }
     }
-
+    #endregion
     public Vector3 HexGridPos => HexGridPoint.LocalPosition;
     public Vector3 HexGridPosWorld => HexGridPoint.HexGrid.transform.TransformPoint(HexGridPoint.LocalPosition);
     public Vector3 HexGridPosStart => HexGridPoint.LocalStartPosition;
     public Vector3 HexGridPosStartWorld => HexGridPoint.HexGrid.transform.TransformPoint(HexGridPoint.LocalStartPosition);
 
     [System.NonSerialized]
+    public bool IsActivated;
+
+    [System.NonSerialized]
     public float TimeActivated = -1;
 
+    [System.NonSerialized]
     private HexGridPoint LastHexGridPoint = null;
-    #endregion
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    private float DeltaActivation => Time.time - TimeActivated;
+     
+  
 
-    // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
-        
+        if (HexGridPoint == null)
+            return;
+        if (IsActivated)
+        {
+            transform.localPosition = HexGridPos;
+            return;
+        }
+
+        if (LastHexGridPoint == null)
+        {
+            if (DeltaActivation < 1.0f)
+                transform.localPosition = Vector3.Lerp(HexGridPosStart, HexGridPos, DeltaActivation);
+            else
+            {
+                transform.localPosition = HexGridPos;
+                IsActivated = true;
+            }
+        }
+        else
+        {
+            float t = (1.0f / HexGrid.Instance.Size.y) * (LastHexGridPoint.Y - HexGridPoint.Y);
+            if (DeltaActivation < t)
+                transform.localPosition = Vector3.Lerp(LastHexGridPoint.LocalPosition, HexGridPos, (1.0f / t) * DeltaActivation);
+            else
+            {
+                transform.localPosition = HexGridPos;
+                IsActivated = true;
+            }
+        }
     }
 
     private SpriteRenderer spriteRenderer;
@@ -118,4 +148,44 @@ public class Hex : MonoBehaviour
         return true;
     }
 
+    public void Deactivate(bool preserveGridPoint = false)
+    {
+        gameObject.SetActive(false);
+        TimeActivated = -1f;
+        IsActivated = false;
+
+        if (!preserveGridPoint)
+        {
+            HexGridPoint.Hex = null;
+            HexGridPoint = null;
+            LastHexGridPoint = null;
+
+            if (this is Bomb)
+            {
+                Bomb bomb = (Bomb)this;
+                if (Bomb.All.Contains(bomb))
+                    Bomb.All.Remove(bomb);
+                Destroy(gameObject);
+            }
+            else
+                Hex.Unused.Enqueue(this);
+        }
+    }
+
+    public static bool ActivatePooled(HexGridPoint hexGridPoint)
+    {
+        if (Unused.Count < 1)
+            return false;
+
+        return Unused.Dequeue().Activate(hexGridPoint, true);
+    }
+
+    public void ActivateInSeconds(float time)
+    {
+        Invoke("Activate", time);
+    }
+
 }
+
+
+//DONE
