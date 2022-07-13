@@ -14,6 +14,8 @@ public class HexGridPoint : MonoBehaviour
     private int y;
     public int Y => y;
 
+    private float xOffset = 0.725f;
+
     public static HexGridPoint[,] All; //This 2d array will only work in runtime bcs 2d arrays are not serializable
 
     public HexGrid HexGrid;
@@ -60,13 +62,13 @@ public class HexGridPoint : MonoBehaviour
 
         if (IsOdd)
         {
-            localPosition = new Vector3(x * HexGrid.HexScale.x * 0.725f, y * HexGrid.HexScale.y);
-            localStartPosition = new Vector3(x * HexGrid.HexScale.x * 0.725f, HexGrid.HexScale.y + LocalPosition.y);
+            localPosition = new Vector3(x * HexGrid.HexScale.x * xOffset, y * HexGrid.HexScale.y);
+            localStartPosition = new Vector3(x * HexGrid.HexScale.x * xOffset, HexGrid.HexScale.y + LocalPosition.y);
         }
         else
         {
-            localPosition = new Vector3(x * HexGrid.HexScale.x * 0.725f, (y * HexGrid.HexScale.y) - (HexGrid.HexScale.y / 2));
-            localStartPosition = new Vector3(x * HexGrid.HexScale.x * 0.725f, HexGrid.HexScale.y + LocalPosition.y - (HexGrid.HexScale.y / 2));
+            localPosition = new Vector3(x * HexGrid.HexScale.x * xOffset, (y * HexGrid.HexScale.y) - (HexGrid.HexScale.y / 2));
+            localStartPosition = new Vector3(x * HexGrid.HexScale.x * xOffset, HexGrid.HexScale.y + LocalPosition.y - (HexGrid.HexScale.y / 2));
         }
     }
 

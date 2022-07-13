@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class HexGrid : MonoBehaviour
 {
-    
-    public static HexGrid Instance { get; set; }
+
+    public static HexGrid Instance;
 
     [Header("Hex Grid Editor")]
     public Vector2Int Size = new Vector2Int(8, 9); //game area 
@@ -22,19 +22,37 @@ public class HexGrid : MonoBehaviour
     public Sprite HexSprite;
     public Sprite BombSprite;
 
-    private HexGridPoint[] HexGridPoints; //public number of hexes's points
-    public Hex[] Hexes;
-    private HexGridJunction[,] HexGridJunctions;
-    private Selector Selector;
-    private Vector3 LastClickedPosition;
-    public bool GameReady = false; // make this enum
-    public bool ExplosionFound = false;
-    public int BombCounter;
 
+    [HideInInspector]
+    private HexGridPoint[] HexGridPoints; //public number of hexes's points
+    [HideInInspector]
+    public Hex[] Hexes;
+    [System.NonSerialized]
+    public HexGridJunction[,] HexGridJunctions;
+    [System.NonSerialized]
+    public Selector Selector;
+    private Vector3 LastClickedPosition;
+
+    [System.NonSerialized]
+    public bool GameReady = false; // make this enum
+
+    [System.NonSerialized]
+    public bool ExplosionFound = false;
+
+    [System.NonSerialized]
+    public int BombCounter;
 
     [System.NonSerialized]
     public float TimeActivated = -1;
 
+    private void Awake()
+    {
+        HexGrid.Instance = this;
+        //AudioSource = gameObject.GetComponent<AudioSource>();
+
+        //if (Bomb.Exploded)
+            //AudioSource.PlayOneShot(AC_BombExplosion);
+    }
 
     public void GenerateGrid()
     {
