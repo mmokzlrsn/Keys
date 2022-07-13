@@ -4,7 +4,7 @@ using UnityEngine;
 
 
 
-public class HexGridJunction : MonoBehaviour
+public class HexGridJunction
 {
     public HexGrid HexGrid;
 
@@ -32,7 +32,7 @@ public class HexGridJunction : MonoBehaviour
         this.y = y;
 
         int gridX = x / 2;
-        if (IsOdd)
+        if (IsOdd) //math stuff
         {
             HexGridPoints[0] = HexGridPoint.All[gridX, gridX % 2 > 0 ? y : y + 1];
             HexGridPoints[1] = HexGridPoint.All[gridX + 1, y];
@@ -48,7 +48,7 @@ public class HexGridJunction : MonoBehaviour
         localPosition = new Vector3((HexGridPoints[0].LocalPosition.x + HexGridPoints[1].LocalPosition.x) / 2, HexGridPoints[0].LocalPosition.y);
     }
 
-    public void SwitchPiecesClockwise()
+    public void SwitchPiecesClockwise() //tried to combine them but i think this is the best version
     {
         Hex[] hexes = new Hex[] { HexGridPoints[0].Hex, HexGridPoints[1].Hex, HexGridPoints[2].Hex };
         if (IsOdd)

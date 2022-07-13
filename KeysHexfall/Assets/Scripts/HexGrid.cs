@@ -1,10 +1,5 @@
 #define DEBUG
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class HexGrid : MonoBehaviour //DONE
 {
@@ -15,14 +10,16 @@ public class HexGrid : MonoBehaviour //DONE
 
     [Header("Hex Grid Editor")]
     public Vector2Int Size = new Vector2Int(8, 9); //game area 
+
+    [HideInInspector]
     public float HexActivationInterval = 0.01f; //for a interval when activating hex
 
     [Header("Hex Editor")]
     public Vector3 HexScale = new Vector3(1, 1, 1); //scale can be change depending on 
-    public Color[] HexColors = new Color[5] { Color.red, Color.green, Color.blue, Color.yellow, Color.cyan };
+    public Color[] HexColors = new Color[5] { Color.red, Color.green, Color.blue, Color.yellow, Color.cyan }; //default colors
     public int BombScore = 1000;
     
-    public bool StartByCheckingExplosions = false;
+    
 
     [Header("Sprites")]
     public Sprite HexSprite;
@@ -49,8 +46,7 @@ public class HexGrid : MonoBehaviour //DONE
     [System.NonSerialized]
     public int BombCounter;
 
-    [System.NonSerialized]
-    public float TimeActivated = -1;
+    
 
     private void Awake()
     {
@@ -115,33 +111,31 @@ public class HexGrid : MonoBehaviour //DONE
 
     void Start()
     {
-        //Prepare two dimentional GridPoint Array for easy access
+        //created two dimentional HexGridPoint Array
         HexGridPoint.All = new HexGridPoint[Size.x, Size.y];
         for (int i = 0; i < HexGridPoints.Length; i++)
             HexGridPoint.All[HexGridPoints[i].X, HexGridPoints[i].Y] = HexGridPoints[i];
 
-        //Initialize GridJunctions
+        //Initialize HexGridJunctions
         HexGridJunctions = new HexGridJunction[(Size.x - 1) * 2, (Size.y - 1)];
         for (int x = 0; x < HexGridJunctions.GetLength(0); x++)
             for (int y = 0; y < HexGridJunctions.GetLength(1); y++)
-                HexGridJunctions[x, y] = gameObject.AddComponent<HexGridJunction>();
+                HexGridJunctions[x, y] = new HexGridJunction(this, x, y);
 
-        //Deactivate All Pieces but preserve their GridPoints and invoke activation.
+        //Deactivate All Pieces but preserve their GridPoints and invoke activation. To use it later
         for (int i = 0; i < Hexes.Length; i++)
         {
             Hexes[i].Deactivate(true);
             Hexes[i].ActivateInSeconds(HexActivationInterval * (i + 1));
         }
 
-        if (StartByCheckingExplosions)
             ExplosionFound = true;
     }
 
     // Update is called once per frame
     private void Update()
     {
-        //This prevents player interaction when we don't need it.
-        //Example: before all pieces falls into place at the start.
+        //user will wait if game is not ready / playable
         if (!GameReady)
         {
             bool allActivated = true;
@@ -166,7 +160,7 @@ public class HexGrid : MonoBehaviour //DONE
             }
             if (allActivated)
             {
-                //If there was an explosion earlier, do not enable the game immedietly, check for repeating explosions due to new pieces being added in and shifts.
+                //for repetitive explosions check the game then if no more left, continue the game
                 if (ExplosionFound)
                     ExplosionFound = CheckForExplosion();
                 else
@@ -177,13 +171,13 @@ public class HexGrid : MonoBehaviour //DONE
 
         Bomb.CheckFuses();
 
-        //Ignore Input if mouse is hovering on top of the header.
+        //prevent to mouse hovering over screen
         if (Input.mousePosition.y < Screen.height - 100)
         {
             if (Input.GetMouseButtonDown(0))
             { 
                 if (Selector.SelectedHexGridJunction == null)
-                    Selector.Activate(Input.mousePosition);
+                    Selector.Activate(Input.mousePosition); //moves selector to the mouseposition that closes of the hex trio
                 LastClickedPosition = Input.mousePosition;
             }
             else if (Input.GetMouseButtonUp(0))
@@ -191,15 +185,10 @@ public class HexGrid : MonoBehaviour //DONE
                 Vector3 delta = Input.mousePosition - LastClickedPosition;
                 if (delta.magnitude > 100.0f)
                 {
-                    #region DEBUG
-#if UNITY_EDITOR && DEBUG
-                    if (Selector.gameObject.activeInHierarchy)
-                        Debug.Log(Input.mousePosition.x + " | " + LastClickedPosition.x);
-#endif
-                    #endregion
+                    
                     if (Selector.gameObject.activeInHierarchy)
                     {
-                        if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+                        if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y)) //calculus stuff
                         {
                             if (Input.mousePosition.x > LastClickedPosition.x)
                                 Selector.RotateClockwise();
@@ -224,7 +213,7 @@ public class HexGrid : MonoBehaviour //DONE
         }
     }
 
-    private void ShiftHexGridPoints(ref int[] numRemoved, ref int[] lastRemoved)
+    private void ShiftHexGridPoints(ref int[] numRemoved, ref int[] lastRemoved) //this will shift the hexes when rotating
     {
 
         for (int x = 0; x < HexGridPoint.All.GetLength(0); x++)
@@ -256,7 +245,7 @@ public class HexGrid : MonoBehaviour //DONE
         }
     }
 
-    public bool CheckForExplosion(HexGridJunction selectedHexGridJunction = null)
+    public bool CheckForExplosion(HexGridJunction hexGridJunction = null)
     {
         //Assign values for default loop
         int xStart = 0;
@@ -275,11 +264,9 @@ public class HexGrid : MonoBehaviour //DONE
                     GameReady = false;
                     int colorIndex = HexGridJunctions[x, y].HexGridPoints[0].Hex.ColorIndex;
 
-                    #region DEBUG
-#if DEBUG
+                    
                     Debug.Log("Explosion found at " + x + "," + y);
-#endif
-                    #endregion
+
                     int[] numRemoved = new int[HexGridPoint.All.GetLength(0)];
                     int[] lastRemoved = new int[HexGridPoint.All.GetLength(0)];
                     for (int i = 0; i < HexGridJunctions[x, y].HexGridPoints.Length; i++)

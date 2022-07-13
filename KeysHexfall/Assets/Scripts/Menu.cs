@@ -9,7 +9,7 @@ public class Menu : MonoBehaviour
     public Text TextScore;
     public Text TextNumMoves;
 
-    private int score = 0;
+    private int score = 0; //default start with + 15 
     public int Score
     #region Property
     {
@@ -32,7 +32,7 @@ public class Menu : MonoBehaviour
 
     private void Awake() => Menu.Instance = this;
 
-    //Todo: Implement reseting static variables just in case
+    
     public void Restart()
     {
         foreach (Bomb bomb in Bomb.All)

@@ -18,14 +18,14 @@ public class Selector : MonoBehaviour //DONE
 
     private SpriteRenderer[] hexSpriteRenderers; //main color accesser
 
-    private int selectorHexNumber = 3;
+    private int selectorHexNumber = 3; //there will be always 3 hexes in selector
 
     public Color[] hexColors; //this will store colors of selected hexes
 
     [System.NonSerialized]
-    public HexGridJunction SelectedHexGridJunction; //
+    public HexGridJunction SelectedHexGridJunction; //this will hold the selected hex trio
 
-    public void GetSpriteRenderers(SpriteRenderer[] spriteRenderers, GameObject[] hexes)
+    public void GetSpriteRenderers(SpriteRenderer[] spriteRenderers, GameObject[] hexes) //gets the sprite of the selected hexes
     {
         for (int i = 0; i < spriteRenderers.Length; i++)
         {
@@ -118,11 +118,13 @@ public class Selector : MonoBehaviour //DONE
         RotateTripleHex();
 
         //Assign Colors
-        //AssignColors();
-        hexColors[0] = SelectedHexGridJunction.HexGridPoints[0].Hex.Color;
+        AssignColors();
+        
+        /* 
+         * hexColors[0] = SelectedHexGridJunction.HexGridPoints[0].Hex.Color;
         hexColors[1] = SelectedHexGridJunction.HexGridPoints[1].Hex.Color;
         hexColors[2] = SelectedHexGridJunction.HexGridPoints[2].Hex.Color;
-
+        */
         //Check if any of the pieces are actually bombs
         AnyBomb();
 
@@ -142,7 +144,7 @@ public class Selector : MonoBehaviour //DONE
 
     }
 
-    private void RotateTripleHex()
+    private void RotateTripleHex() //dont rotate Z axis
     {
         tripleHex.transform.localRotation = SelectedHexGridJunction.IsOdd ? Quaternion.Euler(Vector3.zero) : Quaternion.Euler(Vector3.up * 180);
         hexes[0].transform.localPosition = SelectedHexGridJunction.IsOdd ? new Vector3(-rotationX, 0) : new Vector3(rotationX, 0);
@@ -196,26 +198,10 @@ public class Selector : MonoBehaviour //DONE
 
         //if its bomb, hide textmash active after move
 
-        //HideHexShowBomb();
+        HideHexShowBomb();
+        
 
-        if (SelectedHexGridJunction.HexGridPoints[0].Hex is Bomb)
-        {
-            Bomb bomb = (Bomb)SelectedHexGridJunction.HexGridPoints[0].Hex;
-            bomb.TextMesh.gameObject.GetComponent<MeshRenderer>().enabled = false;
-        }
-        if (SelectedHexGridJunction.HexGridPoints[1].Hex is Bomb)
-        {
-            Bomb bomb = (Bomb)SelectedHexGridJunction.HexGridPoints[1].Hex;
-            bomb.TextMesh.gameObject.GetComponent<MeshRenderer>().enabled = false;
-        }
-        if (SelectedHexGridJunction.HexGridPoints[2].Hex is Bomb)
-        {
-            Bomb bomb = (Bomb)SelectedHexGridJunction.HexGridPoints[2].Hex;
-            bomb.TextMesh.gameObject.GetComponent<MeshRenderer>().enabled = false;
-        }
-
-
-        //convert into enum //prevent player input
+        //convert into enum //prevent player input ??
         HexGrid.Instance.GameReady = false;
 
         //there are 3 rotations so it will be divided to 3
@@ -225,11 +211,11 @@ public class Selector : MonoBehaviour //DONE
         for (int i = 0; i < 3; i++)
         {
             Quaternion rotation = Quaternion.Euler(0, 0, dir * 120 * (i + 1));
-            Quaternion startRotation = Quaternion.Euler(0, 0, dir * 120f * i);
+            Quaternion startRotation = Quaternion.Euler(0, 0, dir * 120f * i); //rotation 360 / 3 
             float startTime = Time.time;
             while (Time.time < startTime + rotationTime)
             {
-                transform.rotation = Quaternion.Lerp(startRotation, rotation, (1f / rotationTime) * (Time.time - startTime));
+                transform.rotation = Quaternion.Lerp(startRotation, rotation, (1f / rotationTime) * (Time.time - startTime)); //LERP
                 yield return null;
             }
             transform.rotation = rotation;
@@ -258,22 +244,22 @@ public class Selector : MonoBehaviour //DONE
             HexGrid.Instance.GameReady = true;
 
             //enable TextMeshRenderers back
-            if (SelectedHexGridJunction.HexGridPoints[0].Hex is Bomb)
+            IsBomb();
+        }
+    }
+
+    public void IsBomb()
+    {
+        for(int i = 0; i < 3; i++ )
+        {
+            if (SelectedHexGridJunction.HexGridPoints[i].Hex is Bomb)
             {
-                Bomb bomb = (Bomb)SelectedHexGridJunction.HexGridPoints[0].Hex;
-                bomb.TextMesh.gameObject.GetComponent<MeshRenderer>().enabled = true;
-            }
-            if (SelectedHexGridJunction.HexGridPoints[1].Hex is Bomb)
-            {
-                Bomb bomb = (Bomb)SelectedHexGridJunction.HexGridPoints[1].Hex;
-                bomb.TextMesh.gameObject.GetComponent<MeshRenderer>().enabled = true;
-            }
-            if (SelectedHexGridJunction.HexGridPoints[2].Hex is Bomb)
-            {
-                Bomb bomb = (Bomb)SelectedHexGridJunction.HexGridPoints[2].Hex;
+                Bomb bomb = (Bomb)SelectedHexGridJunction.HexGridPoints[i].Hex;
                 bomb.TextMesh.gameObject.GetComponent<MeshRenderer>().enabled = true;
             }
         }
+
+            
     }
 
     private void HideHexShowBomb()

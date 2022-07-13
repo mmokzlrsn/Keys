@@ -42,17 +42,6 @@ public class HexGridPoint //DONE
     private Vector3 localStartPosition;
     public Vector3 LocalStartPosition => localStartPosition;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public HexGridPoint(HexGrid hexGrid, int x, int y)
     {
@@ -60,7 +49,7 @@ public class HexGridPoint //DONE
         this.x = x;
         this.y = y;
 
-        if (IsOdd)
+        if (IsOdd) //position is not same if it is Odd 
         {
             localPosition = new Vector3(x * HexGrid.HexScale.x * xOffset, y * HexGrid.HexScale.y);
             localStartPosition = new Vector3(x * HexGrid.HexScale.x * xOffset, HexGrid.HexScale.y + LocalPosition.y);
@@ -72,7 +61,7 @@ public class HexGridPoint //DONE
         }
     }
 
-    public static bool GetCommonNeighbor(HexGridPoint a, HexGridPoint b, HexGridPoint excluding, out HexGridPoint neighbor)
+    public static bool GetCommonNeighbor(HexGridPoint a, HexGridPoint b, HexGridPoint excluding, out HexGridPoint neighbor) //math stuff getting their positions
     {
         neighbor = null;
 
