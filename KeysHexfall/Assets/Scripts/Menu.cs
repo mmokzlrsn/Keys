@@ -41,7 +41,8 @@ public class Menu : MonoBehaviour
 
         Hex.Unused.Clear();
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
     }
 }
 

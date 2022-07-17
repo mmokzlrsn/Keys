@@ -92,6 +92,7 @@ public class HexGrid : MonoBehaviour //DONE
             }
         }
     }
+    
 
     public void RemoveHexGrid()
     {
@@ -111,6 +112,8 @@ public class HexGrid : MonoBehaviour //DONE
 
     void Start()
     {
+        
+        
         //created two dimentional HexGridPoint Array
         HexGridPoint.All = new HexGridPoint[Size.x, Size.y];
         for (int i = 0; i < HexGridPoints.Length; i++)
@@ -122,6 +125,7 @@ public class HexGrid : MonoBehaviour //DONE
             for (int y = 0; y < HexGridJunctions.GetLength(1); y++)
                 HexGridJunctions[x, y] = new HexGridJunction(this, x, y);
 
+
         //Deactivate All Pieces but preserve their GridPoints and invoke activation. To use it later
         for (int i = 0; i < Hexes.Length; i++)
         {
@@ -130,6 +134,8 @@ public class HexGrid : MonoBehaviour //DONE
         }
 
             ExplosionFound = true;
+        
+
     }
 
     // Update is called once per frame
@@ -174,13 +180,13 @@ public class HexGrid : MonoBehaviour //DONE
         //prevent to mouse hovering over screen
         if (Input.mousePosition.y < Screen.height - 100)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && GameReady)
             { 
                 if (Selector.SelectedHexGridJunction == null)
                     Selector.Activate(Input.mousePosition); //moves selector to the mouseposition that closes of the hex trio
                 LastClickedPosition = Input.mousePosition;
             }
-            else if (Input.GetMouseButtonUp(0))
+            else if (Input.GetMouseButtonUp(0) && GameReady)
             {
                 Vector3 delta = Input.mousePosition - LastClickedPosition;
                 if (delta.magnitude > 100.0f)

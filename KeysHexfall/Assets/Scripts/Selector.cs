@@ -146,6 +146,8 @@ public class Selector : MonoBehaviour //DONE
 
     private void RotateTripleHex() //dont rotate Z axis
     {
+        
+
         tripleHex.transform.localRotation = SelectedHexGridJunction.IsOdd ? Quaternion.Euler(Vector3.zero) : Quaternion.Euler(Vector3.up * 180);
         hexes[0].transform.localPosition = SelectedHexGridJunction.IsOdd ? new Vector3(-rotationX, 0) : new Vector3(rotationX, 0);
         hexes[1].transform.localPosition = SelectedHexGridJunction.IsOdd ? new Vector3(rotationX, -rotationY) : new Vector3(-rotationX, -rotationY);
