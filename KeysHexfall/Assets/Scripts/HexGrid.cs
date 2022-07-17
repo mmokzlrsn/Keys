@@ -1,4 +1,5 @@
 #define DEBUG
+using System;
 using UnityEngine;
 
 public class HexGrid : MonoBehaviour //DONE
@@ -112,8 +113,11 @@ public class HexGrid : MonoBehaviour //DONE
 
     void Start()
     {
-        
-        
+        StartInitializing();
+    }
+
+    public void StartInitializing()
+    {
         //created two dimentional HexGridPoint Array
         HexGridPoint.All = new HexGridPoint[Size.x, Size.y];
         for (int i = 0; i < HexGridPoints.Length; i++)
@@ -133,8 +137,7 @@ public class HexGrid : MonoBehaviour //DONE
             Hexes[i].ActivateInSeconds(HexActivationInterval * (i + 1));
         }
 
-            ExplosionFound = true;
-        
+        ExplosionFound = true;
 
     }
 
